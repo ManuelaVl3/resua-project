@@ -1,0 +1,10 @@
+En palabras de Álvaro: son los contratos que definen cómo se comunica la aplicación con el mundo exterior.
+Según chat: Los puertos son abstracciones que definen QUÉ se puede hacer, pero NO CÓMO se hace. Permiten que tu
+lógica de negocio sea independiente de las implementaciones técnicas.
+            Concepto clave:
+            En arquitectura hexagonal, tu aplicación es como una caja con enchufes (puertos):
+            - Los adaptadores son los cables que se conectan a esos enchufes
+            - Puedes cambiar los cables sin cambiar la caja
+            - La caja solo sabe que hay enchufes, no qué hay conectado
+
+y como trae y lleva, cuenta con in y out

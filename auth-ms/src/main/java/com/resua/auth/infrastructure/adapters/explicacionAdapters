@@ -1,0 +1,3 @@
+Chat le dice: el puente entre la lógica de negocio pura y las tecnologías específicas.
+Esto es como un traductor entre el dominio y las tecnologías externas, por ejemplo traduce las
+llamadas del dominio a peticiones HTTP y viceversa. Tiene dos carpetas: in y out

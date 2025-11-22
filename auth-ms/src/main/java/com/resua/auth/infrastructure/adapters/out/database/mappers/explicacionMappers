@@ -1,0 +1,9 @@
+En mis palabras: estos son los convertibles, los tranformadores.
+En palabras de chat: es el intérprete que convierte un idioma al otro sin cambiar el sentido de la información,
+es decir, un traductor entre objetos de diferentes capas (request <-> dominio <-> response), para que todo encaje
+sin que las capas se mezclen.
+
+Se encargan de:
+- Convertir un Request (por ejemplo, CreateUserRequest) en una entidad del dominio (User).
+- Convertir una entidad del dominio en un Response para devolverla al cliente (UserResponse).
+- A veces también mapea entre entidades del dominio y modelos de base de datos (DTOs, entities JPA, etc.).

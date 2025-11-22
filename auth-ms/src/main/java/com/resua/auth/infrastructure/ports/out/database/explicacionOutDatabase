@@ -1,0 +1,3 @@
+Aquí se define cómo la aplicación accede a la base de datos. Aquí tendremos las operaciones básicas,
+las consultas personalizadas.
+Y esto está acá en ports porque define el contrato de qué operaciones de persistencia necesita la apliación

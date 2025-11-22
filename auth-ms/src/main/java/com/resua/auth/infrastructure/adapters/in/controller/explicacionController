@@ -1,0 +1,3 @@
+Bueno, lo que ya conocemos de todos los controladores pero aquí es el método purito sin casos de uso.
+En palabras de Álvaro es el punto de acceso del backend porque todo entra por el controlador
+Recibe peticiones HTTP, valida datos de entrada, llama a los casos de uso correspondientes, devuelve respuestas HTTP

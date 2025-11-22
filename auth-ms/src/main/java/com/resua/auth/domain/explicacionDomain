@@ -1,0 +1,3 @@
+Contiene los modelos de negocio y las reglas de dominio fundamentales. Aquí se definen las entidades.
+No depende de ninguna capa, las demás dependen de esta: No debe tener ninguna dependencia externa (ni bases de datos,
+ni frameworks, ni librerías de infraestructura)

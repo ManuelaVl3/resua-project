@@ -1,0 +1,181 @@
+version: '3.8'
+
+services:
+  # Base de datos para observations-ms
+  observations-postgres:
+    image: postgres:15-alpine
+    container_name: observations-postgres
+    environment:
+      POSTGRES_DB: observations_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - observations_db_data:/var/lib/postgresql/data
+      - ./observations-ms/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./observations-ms/src/main/resources/data.sql:/docker-entrypoint-initdb.d/02-data.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d observations_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - resua-network
+
+  # Base de datos para auth-ms
+  auth-postgres:
+    image: postgres:15-alpine
+    container_name: auth-postgres
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5433:5432"
+    volumes:
+      - auth_postgres_data:/var/lib/postgresql/data
+      - ./auth-ms/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - resua-network
+
+  # Base de datos para community-ms
+  community-postgres:
+    image: postgres:15-alpine
+    container_name: community-postgres
+    environment:
+      POSTGRES_DB: community_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - community_postgres_data:/var/lib/postgresql/data
+      - ./community-ms/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d community_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - resua-network
+
+  # Microservicio de observaciones
+  observations-ms:
+    build:
+      context: ./observations-ms
+      dockerfile: Dockerfile
+    container_name: observations-ms
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://observations-postgres:5432/observations_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: us-east-2
+      AWS_S3_BUCKET_NAME: resua
+    depends_on:
+      observations-postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - resua-network
+
+  # Microservicio de autenticación
+  auth-ms:
+    build:
+      context: ./auth-ms
+      dockerfile: Dockerfile
+    container_name: auth-ms
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-postgres:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
+      JWT_SECRET: B8/aV2WyX9TCH+r0hLSOdZl4f5k6bEwnxJ3qM/o2u+A3cR9gHlV7yK0pLwU8iZ/jI+eS6wY5nB7tD/fRz8kE/g==
+      JWT_EXPIRATION: 86400000
+    depends_on:
+      auth-postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - resua-network
+
+  # Microservicio de comunidad
+  community-ms:
+    build:
+      context: ./community-ms
+      dockerfile: Dockerfile
+    container_name: community-ms
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://community-postgres:5432/community_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVICES_AUTH_URL: http://auth-ms:8083/auth-ms
+      SERVICES_OBSERVATIONS_URL: http://observations-ms:8082/observations-ms
+    depends_on:
+      community-postgres:
+        condition: service_healthy
+      auth-ms:
+        condition: service_started
+      observations-ms:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - resua-network
+
+  # Microservicio de agente con IA
+  agent-ms:
+    build:
+      context: ./agent-ms
+      dockerfile: Dockerfile
+    container_name: agent-ms
+    ports:
+      - "8000:8000"
+    environment:
+      GEMINI_API_KEY: AIzaSyBexMJBcecjK2-NSKe419qR9uhIFGriK2c
+    volumes:
+      - ./agent-ms:/app
+    restart: unless-stopped
+    networks:
+      - resua-network
+
+  # Frontend React
+  resua-frontend:
+    build:
+      context: ./resua-frontend
+      dockerfile: Dockerfile
+    container_name: resua-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - observations-ms
+      - auth-ms
+      - community-ms
+      - agent-ms
+    restart: unless-stopped
+    networks:
+      - resua-network
+
+volumes:
+  observations_db_data:
+  auth_postgres_data:
+  community_postgres_data:
+
+networks:
+  resua-network:
+    driver: bridge
+

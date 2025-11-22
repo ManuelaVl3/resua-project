@@ -1,0 +1,15 @@
+USUARIO
+  ↓
+[Controller] ← ADAPTADOR IN (HTTP/REST)
+  ↓
+[CreateObservation] ← PUERTO IN (interface)
+  ↓
+[CreateObservationImpl] ← CASO DE USO (lógica)
+  ↓ usa ↓
+[Register, Species...] ← DOMINIO (modelos puros)
+  ↓ necesita guardar ↓
+[RegisterRepository] ← PUERTO OUT (interface)
+  ↓
+[RegisterAdapter + JPA] ← ADAPTADOR OUT (database)
+  ↓
+[PostgreSQL] ← BASE DE DATOS

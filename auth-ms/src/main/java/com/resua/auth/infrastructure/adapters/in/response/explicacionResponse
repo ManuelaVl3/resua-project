@@ -1,0 +1,3 @@
+En mis palabras: es lo que respondo al que me está leyendo por allá, por ejemplo un mensaje de confirmación.
+En palabras de chat: contiene la información que la aplicación devuelve al mundo exterior.
+Se usa para formatear la salida de manera que el cliente pueda entender.

@@ -1,0 +1,7 @@
+Aquí vemos interfaces que lo que hacen es exponer las funcionalidades, es decir que cada interfaz
+representa una acción que el usuario puede realizar
+
+y los implementan los casos de uso en la capa application/usecases/, por ejemplo el flujo en el micro de observations-ms:
+- CreateObservationImpl implementa CreateObservation
+- GetObservationByIdImpl implementa GetObservationById
+- Y así sucesivamente...

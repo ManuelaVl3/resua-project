@@ -1,0 +1,9 @@
+Aquí debe ir todo el código técnico y de implementación que conecta la app con cosas externas, es decir,
+contiene todas las implementamciones concretas: bases de datos, APIs REST, servicios externos, configs
+de frameworks, y esas cosas. Sus responsabilidades son:
+- Implementar adaptadores
+- Define los puertos
+-Configuración técnico como librerías, servicios externos, etc
+- Traducción de datos (entities, DTOs y convertibles)
+
+En tus palabras: la visajosa. En las mías: la gorda

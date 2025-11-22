@@ -1,0 +1,14 @@
+Aquí tenemos operaciones relacionadas con infraestructura de afuera como cloud, APIs, archivos, etc.
+En palabras de chat: La carpeta Services en infraestructura contiene servicios técnicos que encapsulan la lógica de
+comunicación con servicios externos o tecnologías específicas.
+
+Algo importante es que yo lo suelo confundir con Adapters PERO son diferentes en que
+ADAPTERS son puentes especificos entre el dominio y algo externo, y SERVICES son herramientas o utilidades
+que ayudan a esos adapters a funcionar.
+
+ Ejemplo de chat:
+ Imagina que tu aplicación necesita enviar un correo cuando se crea un usuario.
+ El adapter sería el que implementa el puerto del dominio, por ejemplo EmailSenderPort, y usa algo como EmailAdapter
+ para cumplir con lo que el dominio necesita: “enviar correo”.
+ Pero ese adapter podría usar dentro de sí un service, como MailService, que sabe cómo conectarse al servidor de
+ correo, usar la API, manejar errores o adjuntos, etc.

@@ -1,0 +1,2 @@
+Aquí tenemos más interfaces que definen qué necesitamos de afuera, los servicios externos requeridos.
+Es decir, todo lo que la aplicación necesita pero no implementa por ella misma
