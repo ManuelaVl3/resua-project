@@ -148,7 +148,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      GEMINI_API_KEY: AIzaSyDGYSPMB8AscSOcDG-A06bFEaXhjhCJMBU
+      GEMINI_API_KEY: AIzaSyAef6_Xkp9VFcO645v48IUZ8070k3m2IIg
     volumes:
       - ./agent-ms:/app
     restart: unless-stopped

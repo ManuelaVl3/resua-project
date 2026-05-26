@@ -67,7 +67,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
             password="1234",
             database="observations_db",
             host="host.docker.internal",
-            port=5432,
+            port=5435,
         )
         print("✅ Pool de conexiones a PostgreSQL observations_db creado.")
         yield AppContext(db_pool=pool)

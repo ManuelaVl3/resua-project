@@ -13,23 +13,8 @@ jobs:
   # Requisitos: 1 (registro), 2 (login), 10 (JWT)
   # ─────────────────────────────────────────────
   auth-ms:
-    name: auth-ms — Pruebas unitarias
+    name: auth-ms — Pruebas unitarias + contexto (H2 en memoria)
     runs-on: ubuntu-latest
-
-    services:
-      auth-postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_DB: auth_db
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: "1234"
-        ports:
-          - 5433:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d auth_db"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
       - name: Checkout del repositorio
@@ -42,12 +27,9 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Ejecutar pruebas unitarias
+      - name: Ejecutar todas las pruebas
         working-directory: auth-ms
-        run: |
-          ./mvnw test \
-            -Dtest="JwtServiceTest,LoginUserImplTest,CreateUserImplTest,VerifySecretAnswerImplTest,ResetPasswordImplTest,UpdateUserImplTest,GetUserByIdImplTest,GetUserByEmailImplTest,UserDetailsServiceImplTest" \
-            --no-transfer-progress
+        run: ./mvnw test --no-transfer-progress
 
       - name: Publicar reporte de pruebas
         if: always()
@@ -62,7 +44,7 @@ jobs:
   #             8 (edición), 9 (eliminación), 11 (rendimiento), 12 (persistencia)
   # ─────────────────────────────────────────────────────────────────────────
   observations-ms:
-    name: observations-ms — Pruebas unitarias
+    name: observations-ms — Pruebas (H2 en memoria para contextLoads)
     runs-on: ubuntu-latest
 
     steps:
@@ -76,12 +58,9 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Ejecutar pruebas unitarias
+      - name: Ejecutar todas las pruebas
         working-directory: observations-ms
-        run: |
-          ./mvnw test \
-            -Dtest="CreateObservationImplTest,LocalStorageServiceTest,GetObservationByIdImplTest,GetObservationByUserImplTest,UpdateObservationImplTest,DeleteObservationByIdImplTest,RegisterAdapterTest,GetObservationByUserPerformanceTest" \
-            --no-transfer-progress
+        run: ./mvnw test --no-transfer-progress
 
       - name: Publicar reporte de pruebas
         if: always()
