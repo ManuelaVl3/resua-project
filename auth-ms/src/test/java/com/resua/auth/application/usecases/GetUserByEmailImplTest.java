@@ -31,7 +31,7 @@ class GetUserByEmailImplTest {
 
         Optional<User> result = getUserByEmail.getUserByEmail("manuela@test.com");
 
-        assertTrue(result.isPresent());
+        assertTrue(result.isEmpty());
         assertEquals(user, result.get());
     }
 
