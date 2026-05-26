@@ -84,6 +84,8 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_REGION: us-east-2
       AWS_S3_BUCKET_NAME: resua
+    volumes:
+      - observations_images:/app/uploads
     depends_on:
       observations-postgres:
         condition: service_healthy
@@ -146,7 +148,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      GEMINI_API_KEY: AIzaSyBexMJBcecjK2-NSKe419qR9uhIFGriK2c
+      GEMINI_API_KEY: AIzaSyDGYSPMB8AscSOcDG-A06bFEaXhjhCJMBU
     volumes:
       - ./agent-ms:/app
     restart: unless-stopped
@@ -174,6 +176,7 @@ volumes:
   observations_db_data:
   auth_postgres_data:
   community_postgres_data:
+  observations_images:
 
 networks:
   resua-network:

@@ -8,17 +8,37 @@ const TopBar = () => {
 
   useEffect(() => {
     // Verificar si el usuario está autenticado
-    setIsAuthenticated(authService.isAuthenticated())
+    const checkAuth = () => {
+      setIsAuthenticated(authService.isAuthenticated())
+    }
+    
+    // Verificar al montar
+    checkAuth()
+    
+    // Verificar cada vez que cambia el localStorage (cuando se inicia/cierra sesión)
+    window.addEventListener('storage', checkAuth)
+    
+    // Verificar periódicamente por si acaso
+    const interval = setInterval(checkAuth, 1000)
+    
+    return () => {
+      window.removeEventListener('storage', checkAuth)
+      clearInterval(interval)
+    }
   }, [])
 
   const handleUserIconClick = () => {
     if (isAuthenticated) {
-      // Si está autenticado, cerrar sesión
-      authService.logout()
+      // Si está autenticado, ir al perfil
+      window.location.href = '/profile'
     } else {
       // Si no está autenticado, ir al login
       window.location.href = '/login'
     }
+  }
+
+  const handleLogout = () => {
+    authService.logout()
   }
 
   const handleRegistrosClick = () => {
@@ -85,17 +105,17 @@ const TopBar = () => {
           Registros
         </span>
         
-        {/* Icono de usuario o logout */}
+        {/* Icono de usuario */}
         <div 
           onClick={handleUserIconClick}
           style={{
-          width: '32px',
-          height: '32px',
-          backgroundColor: theme.colors.light,
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+            width: '32px',
+            height: '32px',
+            backgroundColor: theme.colors.light,
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             cursor: 'pointer',
             transition: 'transform 0.2s ease, box-shadow 0.2s ease'
           }}
@@ -108,25 +128,6 @@ const TopBar = () => {
             e.currentTarget.style.boxShadow = 'none'
           }}
         >
-          {isAuthenticated ? (
-            // Icono de logout si está autenticado
-            <svg 
-              width="16" 
-              height="16" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path 
-                d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9M16 17L21 12M21 12L16 7M21 12H9" 
-                stroke={theme.colors.primary}
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-              />
-            </svg>
-          ) : (
-            // Icono de usuario si NO está autenticado
           <svg 
             width="16" 
             height="16" 
@@ -143,8 +144,49 @@ const TopBar = () => {
               fill={theme.colors.primary}
             />
           </svg>
-          )}
         </div>
+
+        {/* Icono de logout (solo si está autenticado) */}
+        {isAuthenticated && (
+          <div 
+            onClick={handleLogout}
+            style={{
+              width: '32px',
+              height: '32px',
+              backgroundColor: theme.colors.light,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'scale(1.1)'
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'scale(1)'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
+          >
+            <svg 
+              width="16" 
+              height="16" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path 
+                d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9M16 17L21 12M21 12L16 7M21 12H9" 
+                stroke={theme.colors.primary}
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        )}
       </div>
     </header>
   )

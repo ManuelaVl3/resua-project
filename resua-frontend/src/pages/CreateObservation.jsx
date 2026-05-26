@@ -155,9 +155,11 @@ const CreateObservation = () => {
 
       await observationsService.createObservation(body)
       setShowSuccessMessage(true)
-      setTimeout(() => setShowSuccessMessage(false), 2500)
-      setFormData({ images: [], commonName: '', scientificName: '', category: '', observationDetail: '', addressDescription: '' })
-      setImagePreview(null)
+      
+      // Redirigir a Mis Registros después de 1.5 segundos
+      setTimeout(() => {
+        window.location.href = '/my-observations'
+      }, 1500)
     } catch (err) {
       console.error('Error creando observación:', err)
       const apiMsg = err?.response?.data?.message || err?.response?.data?.detail
@@ -561,7 +563,23 @@ const CreateObservation = () => {
             width: '100%'
           }}>
             <div></div>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={() => window.location.href = '/my-observations'}
+                style={{
+                  backgroundColor: theme.colors.white,
+                  color: theme.colors.primary,
+                  border: `2px solid ${theme.colors.primary}`,
+                  padding: '5px 48px',
+                  fontSize: '18px',
+                  cursor: 'pointer'
+                }}
+                disabled={isSubmitting}
+              >
+                Regresar
+              </Button>
               <Button
                 variant={isFormValid() ? "primary" : "disabled"}
                 size="lg"

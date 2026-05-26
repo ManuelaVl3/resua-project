@@ -7,20 +7,22 @@ import com.resua.observations.domain.models.Species;
 import com.resua.observations.infrastructure.adapters.in.request.ObservationRequestDTO;
 import com.resua.observations.infrastructure.adapters.out.database.RegisterAdapter;
 import com.resua.observations.infrastructure.ports.in.CreateObservation;
-import com.resua.observations.infrastructure.services.S3Service;
+import com.resua.observations.infrastructure.services.LocalStorageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CreateObservationImpl implements CreateObservation {
 
     private final RegisterAdapter registerAdapter;
-    private final S3Service s3Service;
+    private final LocalStorageService localStorageService;
 
     @Override
     public Register createObservation(ObservationRequestDTO observationDTO) {
@@ -46,27 +48,45 @@ public class CreateObservationImpl implements CreateObservation {
         Register savedRegister = registerAdapter.createObservation(register);
         
         if (observationDTO.getImages() != null && !observationDTO.getImages().isEmpty()) {
-            List<RegisterImage> imageList = new ArrayList<>();
-            
-            for (var imageDTO : observationDTO.getImages()) {
-                String imageUrl = s3Service.uploadImage(
-                        imageDTO.getImageData(),
-                        savedRegister.getUserId(),
-                        savedRegister.getId(),
-                        imageDTO.getImageOrder()
-                );
+            try {
+                List<RegisterImage> imageList = new ArrayList<>();
                 
-                RegisterImage registerImage = RegisterImage.builder()
-                        .imageUrl(imageUrl)
-                        .imageOrder(imageDTO.getImageOrder())
-                        .createdAt(LocalDateTime.now())
-                        .build();
+                for (var imageDTO : observationDTO.getImages()) {
+                    try {
+                        String imageUrl = localStorageService.uploadImage(
+                                imageDTO.getImageData(),
+                                savedRegister.getUserId(),
+                                savedRegister.getId(),
+                                imageDTO.getImageOrder()
+                        );
+                        
+                        RegisterImage registerImage = RegisterImage.builder()
+                                .imageUrl(imageUrl)
+                                .imageOrder(imageDTO.getImageOrder())
+                                .createdAt(LocalDateTime.now())
+                                .build();
+                        
+                        imageList.add(registerImage);
+                    } catch (Exception e) {
+                        log.error("Error al subir imagen individual (orden: {}): {}", 
+                                imageDTO.getImageOrder(), e.getMessage());
+                        // Continuar con las demás imágenes aunque una falle
+                    }
+                }
                 
-                imageList.add(registerImage);
+                if (!imageList.isEmpty()) {
+                    savedRegister.setImages(imageList);
+                    savedRegister = registerAdapter.updateObservation(savedRegister);
+                } else {
+                    log.warn("No se pudo subir ninguna imagen para la observación ID: {}", 
+                            savedRegister.getId());
+                }
+            } catch (Exception e) {
+                log.error("Error general al procesar imágenes para la observación ID: {}: {}", 
+                        savedRegister.getId(), e.getMessage());
+                // No lanzar la excepción, solo loguear el error
+                // La observación ya fue creada exitosamente
             }
-            
-            savedRegister.setImages(imageList);
-            savedRegister = registerAdapter.updateObservation(savedRegister);
         }
         
         return savedRegister;

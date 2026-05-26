@@ -18,7 +18,9 @@ class GeminiService:
     
     def identify_species(self, image_data: bytes) -> Dict[str, Any]:
         try:
+            print(f"Recibida imagen de {len(image_data)} bytes")
             image = Image.open(io.BytesIO(image_data))
+            print(f"Imagen abierta correctamente: {image.size}, modo: {image.mode}")
             
             prompt = """Identifica la especie animal en la imagen. Responde ÚNICAMENTE en formato JSON con exactamente 3 recomendaciones ordenadas por confianza.
 
@@ -46,12 +48,19 @@ IMPORTANTE: Asigna porcentajes de confianza reales basados en qué tan seguro es
 
 Si no puedes identificar la especie: {"error": "No se pudo identificar la especie"}"""
             
+            print("🤖 Llamando a Gemini...")
             response = self.model.generate_content([prompt, image])
             response_text = response.text.strip()
+            print(f"✅ Respuesta de Gemini: {response_text[:200]}...")
             
-            return self._parse_response(response_text)
+            result = self._parse_response(response_text)
+            print("✅ Respuesta parseada correctamente")
+            return result
             
         except Exception as e:
+            print(f"❌ Error en identify_species: {type(e).__name__}: {str(e)}")
+            import traceback
+            traceback.print_exc()
             raise Exception(f"Error al procesar la imagen con Gemini: {str(e)}")
     
     def _parse_response(self, response_text: str) -> Dict[str, Any]:

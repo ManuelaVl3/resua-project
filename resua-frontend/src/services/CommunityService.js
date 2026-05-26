@@ -6,8 +6,7 @@ class CommunityService {
     
     async getCommentsByObservationId(observationId) {
         try {
-            // Intentar obtener el token de diferentes claves posibles
-            const token = localStorage.getItem('token') || 
+            const token = localStorage.getItem('token') ||
                          localStorage.getItem('authToken') || 
                          localStorage.getItem('jwt');
             
@@ -15,7 +14,6 @@ class CommunityService {
                 'Content-Type': 'application/json'
             };
             
-            // Agregar el token si está disponible (puede que algunos endpoints no requieran autenticación)
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;
             }
