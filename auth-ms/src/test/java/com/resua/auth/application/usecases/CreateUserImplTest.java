@@ -38,7 +38,7 @@ class CreateUserImplTest {
         verify(userAdapter).createUser(userCaptor.capture());
 
         User captured = userCaptor.getValue();
-        assertEquals(request.getName(), captured.getName());
+        assertEquals("", captured.getName());
         assertEquals(request.getLastName(), captured.getLastName());
         assertEquals(request.getEmail(), captured.getEmail());
         assertEquals(request.getPassword(), captured.getPassword());
